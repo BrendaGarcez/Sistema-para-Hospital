@@ -13,12 +13,10 @@ typedef struct no{
 
 No *alocaNo(int id, char nome[], int idade, char condicaoMed[]);
 No *insereNoRec(No *raiz, int id, char nome[], int idade, char condicaoMed[]);
-///arrumar daqui para baixo
-No *buscarNo(No *raiz, int chave);
-No *buscarNoRec(No *raiz, int chave);
-void preOrdem(No *raiz);
+No *buscarNoRecId(No *raiz, int id);
+No *buscarNoRecNome(No *raiz, char nome[]);
 void emOrdem(No *raiz);
-void posOrdem(No *raiz);
+///arrumar daqui para baixo
 //No *remover(No *raiz, int chave);
 No **buscaPai(No **raiz, int k);
 void removeNo(No **raiz, int k);
@@ -26,7 +24,7 @@ No **ppMenor(No **raiz);
 
 int main()
 {
-    No *raiz=NULL, *achouId=NULL, **achouPai=NULL;
+    No *raizId=NULL, *raizNome=NULL, *achouId=NULL, **achouNome=NULL;
     int op=1, id, idade;
     char nome[20], condicaoMed[20];
     while(op!=5)
@@ -39,18 +37,20 @@ int main()
                 printf("\nInforme o ID do paciente: ");
                 scanf("%d",&id);
                 printf("\nInforme o nome do paciente: ");
-                scanf("%s", &nome);
+                scanf("%c", &nome);
                 printf("\nInforme a idade do paciente: ");
                 scanf("%d",&idade);
                 printf("\nInforme a condição médica do paciente: ");
                 scanf("%s", &condicaoMed);
 
-                raiz = insereNoRec(raiz, id, nome, idade, condicaoMed);
+                raizId = insereNoRecId(raizId, id, nome, idade, condicaoMed);
+                raizNome = insereNoRecId(raizNome, id, nome, idade, condicaoMed);
+
             }break;
             case 2:{
                 printf("\nInforme o ID:");
                 scanf("%d", &id);
-                achouId = buscarNoRec(raiz, id);
+                achouId = buscarNoRecId(raizId, id);
                 if(achouId)
                 {
                     printf("Paciente: %s", achouId->nome);
@@ -62,7 +62,7 @@ int main()
             case 3:{
                 printf("\nInforme o nome do paciente: ");
                 scanf("%s", &nome);
-                achouId = buscarNoRec(raiz, nome);
+                achouNome = buscarNoRec(raizNome, nome);
                 if(achouId)
                 {
                     printf("Paciente: %s", achouId->nome);
@@ -74,14 +74,14 @@ int main()
             case 4:{
                 printf("Informe o ID do paciente a ser removido: ");
                 scanf("%d",&id);
-                removeNo(&raiz, id);
+                removeNo(&raizId, id);
             }break;
         }
     }
 
 }
 
-No *alocaNoNo(int id, char nome[], int idade, char condicaoMed[])
+No *alocaNo(int id, char nome[], int idade, char condicaoMed[])
 {
     No *novo=NULL;
     novo = (No *)malloc(sizeof(No));
@@ -93,7 +93,6 @@ No *alocaNoNo(int id, char nome[], int idade, char condicaoMed[])
         strcpy(novo->condicaoMed, condicaoMed);
         novo->dir = NULL;
         novo->esq = NULL;
-        return novo;
     }
     return novo;
 }
@@ -111,30 +110,7 @@ No *insereNoRec(No *raiz, int id, char nome[], int idade, char condicaoMed[])
     }
     printf("\n\nInserido com sucesso!!");
 }
-
-No *buscarNo(No *raiz, int id)
-{
-    //NO *aux=raiz;
-    if(raiz == NULL)
-        return NULL;
-    else
-    {
-       while(raiz)
-       {
-           if(raiz->id == id)
-              return raiz;
-           else
-           {
-               if(id < raiz->id)
-                    raiz = raiz->esq;
-               else
-                    raiz = raiz->dir;
-           }
-       }
-    }
-}
-
-No *buscarNoRec(No *raiz, int id)
+No *buscarNoRecId(No *raiz, int id)
 {
     //caso base 1
     if(raiz == NULL)
@@ -145,9 +121,25 @@ No *buscarNoRec(No *raiz, int id)
     else
     {
         if(id < raiz->id)
-            return buscarNoRec(raiz->esq, id);
+            return buscarNoRecId(raiz->esq, id);
         else
-            return buscarNoRec(raiz->dir, id);
+            return buscarNoRecId(raiz->dir, id);
+    }
+}
+No *buscarNoRecNome(No *raiz, char nome[])
+{
+    //caso base 1
+    if(raiz == NULL)
+        return NULL;
+    //caso base 2
+    if(nome == raiz->nome)
+        return raiz;
+    else
+    {
+        if(nome < raiz->nome)
+            return buscarNoRecNome(raiz->esq, nome);
+        else
+            return buscarNoRecNome(raiz->dir, nome);
     }
 }
 //esq, raiz, dir
