@@ -13,13 +13,14 @@ typedef struct no{
 
 No *alocaNo(int id, char nome[], int idade, char condicaoMed[]);
 No *insereNoRec(No *raiz, int id, char nome[], int idade, char condicaoMed[]);
+No *insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]);
 No *buscarNoRecId(No *raiz, int id);
 No *buscarNoRecNome(No *raiz, char nome[]);
 void emOrdem(No *raiz);
 ///arrumar daqui para baixo
 //No *remover(No *raiz, int chave);
-No **buscaPai(No **raiz, int k);
-void removeNo(No **raiz, int k);
+//No **buscaPai(No **raiz, int k);
+//void removeNo(No **raiz, int k);
 No **ppMenor(No **raiz);
 
 int main()
@@ -27,12 +28,15 @@ int main()
     No *raizId=NULL, *raizNome=NULL, *achouId=NULL, **achouNome=NULL;
     int op=1, id, idade;
     char nome[20], condicaoMed[20];
-    while(op!=6)
+    while(op!=8)
     {
-        printf("\n 1-Cadastro de Paciente \n 2-Buscar por ID \n 3-Buscar por Nome \n 4-Remover Paciente \n 5-Listar Pacientes \n 6-Sair ");
+        printf(" 0-Informe quantos pacientes irá cadastrar \n 1-Cadastro de Paciente \n 2-Buscar por ID \n 3-Buscar por Nome \n 4-Remover Paciente \n 5-Remover paciente por Nome: \n 6-Listar Pacientes por Id \n 7-Lista Pacientes por nome \n 8-Sair \n");
         scanf("%d",&op);
         switch(op)
         {
+            case 0:{
+                ////para o for
+            }break;
             case 1:{
                 printf("\nInforme o ID do paciente: ");
                 scanf("%d",&id);
@@ -44,7 +48,7 @@ int main()
                 scanf("%s", condicaoMed);
 
                 raizId = insereNoRec(raizId, id, nome, idade, condicaoMed);
-                raizNome = insereNoRec(raizNome, id, nome, idade, condicaoMed);
+                raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed);
 
             }break;
             case 2:{
@@ -53,7 +57,7 @@ int main()
                 achouId = buscarNoRecId(raizId, id);
                 if(achouId)
                 {
-                    printf("Paciente: %s", achouId->nome);
+                    printf(" ID: %d | Paciente: %s | Idade: %d | Condicao Medica: %s\n", achouId->id, achouId->nome, achouId->idade, achouId->condicaoMed);
                 }
                 else
                     printf("\nPaciente nao encontrado!");
@@ -65,7 +69,7 @@ int main()
                 *achouNome = buscarNoRecNome(raizNome, nome);
                 if(achouId)
                 {
-                    printf("Paciente: %s", achouId->nome);
+                    printf(" ID: %d | Paciente: %s | Idade: %d | Condicao Medica: %s\n", achouId->id, achouId->nome, achouId->idade, achouId->condicaoMed);
                 }
                 else
                     printf("\nPaciente nao encontrado!");
@@ -74,14 +78,22 @@ int main()
             case 4:{
                 printf("Informe o ID do paciente a ser removido: ");
                 scanf("%d",&id);
-                removeNo(&raizId, id);
+                //removeNo(&raizId, id);
             }break;
             case 5:{
-                ///listar pacientes por nome e por ID 
+                printf("Informe o nome do paciente a ser removido: ");
+                scanf("%s", nome);
+            }break;
+            case 6:{
+                printf("\n Lista por ID: ");
+                emOrdem(raizId);
+            }break;
+            case 7:{
+                printf("\n Lista por nome: ");
+                emOrdem(raizNome);
             }break;
         }
     }
-
 }
 
 No *alocaNo(int id, char nome[], int idade, char condicaoMed[])
@@ -111,9 +123,22 @@ No *insereNoRec(No *raiz, int id, char nome[], int idade, char condicaoMed[])
         else
             raiz->dir = insereNoRec(raiz->dir, id, nome, idade, condicaoMed);
     }
-    printf("\n\nInserido com sucesso!!");
     return raiz;
 }
+No *insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[])
+{
+    if(raiz == NULL)
+        return alocaNo(id, nome, idade, condicaoMed);
+    else
+    {
+        if(nome < raiz->nome)
+            raiz->esq = insereNoRec(raiz->esq, id, nome, idade, condicaoMed);
+        else
+            raiz->dir = insereNoRec(raiz->dir, id, nome, idade, condicaoMed);
+    }
+    return raiz;
+}
+
 No *buscarNoRecId(No *raiz, int id)
 {
     //caso base 1
@@ -150,27 +175,12 @@ No *buscarNoRecNome(No *raiz, char nome[])
 void emOrdem(No *raiz){
     if (raiz != NULL) {
         emOrdem(raiz->esq);
-        printf("ID:%d | Paciente:%s | Idade:%d | Condição Médica: %s", raiz->id, raiz->nome, raiz->idade, raiz->condicaoMed);
+        printf(" ID:%d | Paciente:%s | Idade:%d | Condição Médica: %s\n", raiz->id, raiz->nome, raiz->idade, raiz->condicaoMed);
         emOrdem(raiz->dir);
     }
 }
 
-/*No **buscaPai(No **raiz, int k)
-{
-  if (*raiz == NULL)
-    return NULL;
-  while(*raiz!=NULL)
-  {
-      if((*raiz)->id == k)
-        return raiz;
-      if((*raiz)->id < k)
-        raiz = &((*raiz)->dir);
-      else
-        raiz = &((*raiz)->esq);
-  }
-}*/
-
-void removeNo(No **raiz, int k)
+/*void removeNo(No **raiz, int k)
 {
     No **pai=NULL;
     if((*raiz) == NULL)
@@ -192,11 +202,11 @@ void removeNo(No **raiz, int k)
                 No *paux=(*pai)->esq; //guardando end. filho
                 free((*pai));
                 *pai = paux;
-                /*
+                
                 No *paux=(*pai);
                 *pai = (*pai)->esq;
                 free(*paux);
-                */
+                
             }
             if((*pai)->dir != NULL)
             {
@@ -220,15 +230,4 @@ void removeNo(No **raiz, int k)
             }
         }
     }
-}
-
-No **ppMenor(No **raiz)//a entrada � o lado direito da �rvore
-{
-    No **pmenor=raiz;
-    while((*pmenor)->esq)
-    {
-        printf("\n%d", (*pmenor)->id);
-        pmenor = &(*pmenor)->esq;
-    }
-    return pmenor;
-}
+}*/
