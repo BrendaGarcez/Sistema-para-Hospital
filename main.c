@@ -25,7 +25,7 @@ No **ppMenor(No **raiz);
 
 int main()
 {
-    No *raizId=NULL, *raizNome=NULL, *achouId=NULL, **achouNome=NULL;
+    No *raizId=NULL, *raizNome=NULL, *achouId=NULL, *achouNome=NULL;
     int op=1, id, idade;
     char nome[20], condicaoMed[20];
     while(op!=8)
@@ -66,8 +66,8 @@ int main()
             case 3:{
                 printf("\nInforme o nome do paciente: ");
                 scanf("%s", nome);
-                *achouNome = buscarNoRecNome(raizNome, nome);
-                if(achouId)
+                achouNome = buscarNoRecNome(raizNome, nome);
+                if(achouNome)
                 {
                     printf(" ID: %d | Paciente: %s | Idade: %d | Condicao Medica: %s\n", achouId->id, achouId->nome, achouId->idade, achouId->condicaoMed);
                 }
@@ -131,7 +131,7 @@ No *insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]
         return alocaNo(id, nome, idade, condicaoMed);
     else
     {
-        if(nome < raiz->nome)
+        if(strcmp(nome, raiz->nome) < 0)
             raiz->esq = insereNoRec(raiz->esq, id, nome, idade, condicaoMed);
         else
             raiz->dir = insereNoRec(raiz->dir, id, nome, idade, condicaoMed);
@@ -161,11 +161,11 @@ No *buscarNoRecNome(No *raiz, char nome[])
     if(raiz == NULL)
         return NULL;
     //caso base 2
-    if(nome == raiz->nome)
+    if(strcmp(nome, raiz->nome) == 0)
         return raiz;
     else
     {
-        if(nome < raiz->nome)
+        if(strcmp(nome, raiz->nome) < 0)
             return buscarNoRecNome(raiz->esq, nome);
         else
             return buscarNoRecNome(raiz->dir, nome);
