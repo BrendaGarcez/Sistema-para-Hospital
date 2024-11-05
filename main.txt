@@ -19,38 +19,18 @@ No *buscarNoRecNome(No *raiz, char nome[]);
 void emOrdem(No *raiz);
 ///arrumar daqui para baixo
 //No *remover(No *raiz, int chave);
+//No **buscaPai(No **raiz, int k);
 //void removeNo(No **raiz, int k);
-void desalocarArvore(No *no); 
+No **ppMenor(No **raiz);
 
 int main()
 {
     No *raizId=NULL, *raizNome=NULL, *achouId=NULL, *achouNome=NULL;
-    int op=1, op2, id, idade;
+    int op=1, id, idade;
     char nome[20], condicaoMed[20];
-
-    //////fara a leitura de primeiro cadastro por texto
-    printf("Deseja inserir por:\n");
-    printf(" 1 - ID\n 2-Nome\n");
-    /*scanf("%d", &op2);
-    switch(op2)
+    while(op!=8)
     {
-    case 1:{
-
-    }
-    break;
-    case 2:{
-
-    }
-    break;
-    default:
-        printf("\nFalha na inserção!!\n");
-        break;
-    }*/
-
-    /////rodara para talvez outra inserçao e busca e remoção
-    while(op!=9)
-    {
-        printf("\n 1-Cadastro de Paciente por ID \n 2-Cadastro de Paciente por Nome \n 3-Buscar por ID \n 4-Buscar por Nome \n 5-Remover Paciente \n 6-Remover paciente por Nome: \n 7-Listar Pacientes por Id \n 8-Lista Pacientes por nome \n 9-Sair \n");
+        printf(" 0-Informe quantos pacientes irá cadastrar \n 1-Cadastro de Paciente \n 2-Buscar por ID \n 3-Buscar por Nome \n 4-Remover Paciente \n 5-Remover paciente por Nome: \n 6-Listar Pacientes por Id \n 7-Lista Pacientes por nome \n 8-Sair \n");
         scanf("%d",&op);
         switch(op)
         {
@@ -89,7 +69,7 @@ int main()
                 achouNome = buscarNoRecNome(raizNome, nome);
                 if(achouNome)
                 {
-                    printf(" ID: %d | Paciente: %s | Idade: %d | Condicao Medica: %s\n", achouNome->id, achouNome->nome, achouNome->idade, achouNome->condicaoMed);
+                    printf(" ID: %d | Paciente: %s | Idade: %d | Condicao Medica: %s\n", achouId->id, achouId->nome, achouId->idade, achouId->condicaoMed);
                 }
                 else
                     printf("\nPaciente nao encontrado!");
@@ -114,9 +94,6 @@ int main()
             }break;
         }
     }
-
-    desalocarArvore(raizId);
-    desalocarArvore(raizNome);
 }
 
 No *alocaNo(int id, char nome[], int idade, char condicaoMed[])
@@ -155,9 +132,9 @@ No *insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]
     else
     {
         if(strcmp(nome, raiz->nome) < 0)
-            raiz->esq = insereNoRecNome(raiz->esq, id, nome, idade, condicaoMed);
+            raiz->esq = insereNoRec(raiz->esq, id, nome, idade, condicaoMed);
         else
-            raiz->dir = insereNoRecNome(raiz->dir, id, nome, idade, condicaoMed);
+            raiz->dir = insereNoRec(raiz->dir, id, nome, idade, condicaoMed);
     }
     return raiz;
 }
@@ -254,14 +231,3 @@ void emOrdem(No *raiz){
         }
     }
 }*/
-
-void desalocarArvore(No *no) {
-    if (no == NULL) {
-        return;
-    }
-    desalocarArvore(no->esq);
-    desalocarArvore(no->dir);
-
-    free(no);
-    no = NULL;
-}
