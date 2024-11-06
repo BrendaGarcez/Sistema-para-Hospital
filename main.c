@@ -36,8 +36,8 @@ int main()
             printf("Erro ao abrir o arquivo de saida.\n");
             return 1;
         }
-        arq = fopen("Arquivo de entrada.txt", "r");
-        if (!arq) { 
+        arq = fopen("arquivoDeEntrada.txt", "r");
+        if (arq == NULL) { 
             printf("Erro ao abrir o arquivo de entrada.\n");
             return 1;
         }
