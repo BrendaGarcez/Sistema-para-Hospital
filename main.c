@@ -17,6 +17,7 @@ No *buscarNoRecId(No *raiz, int id);
 No *insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]);
 No *buscarNoRecNome(No *raiz, char nome[]);
 void emOrdem(No *raiz);
+void emOrdemArquivo(No *raiz, FILE *arquivo);
 void desalocarArvore(No *no);
 ///arrumar daqui para baixo
 ///renomear busca pai para buscaporID
@@ -27,7 +28,7 @@ No **ppMenor(No **raiz);
 int main()
 {
     No *raizId = NULL, *raizNome=NULL, *achouId=NULL, *achouNome=NULL;
-    int op=1, op2, op3 = 0, id, idade, totalPacientes, i;
+    int op=1, op2, op3 = 0, id, idade, totalPacientes, i = 0;
     char nome[20], condicaoMed[20];
 
         FILE *log = NULL, *arq = NULL;
@@ -36,7 +37,7 @@ int main()
             printf("Erro ao abrir o arquivo de saida.\n");
             return 1;
         }
-        arq = fopen("arquivoDeEntrada.txt", "r");
+        arq = fopen("Arquivo de Entrada.txt", "r");
         if (arq == NULL) { 
             printf("Erro ao abrir o arquivo de entrada.\n");
             return 1;
@@ -48,20 +49,16 @@ int main()
         switch(op2)
         {
         case 1:{
-                printf("\n Total de pacientes: ");
-                fscanf(arq,"%d", &totalPacientes);
-                while(i < totalPacientes){
-                    printf("\nInforme o ID do paciente: ");
-                    fscanf(arq,"%d",&id);
-                    printf("\nInforme o nome do paciente: ");
-                    fscanf(arq,"%s", nome);
-                    printf("\nInforme a idade do paciente: ");
-                    fscanf(arq,"%d",&idade);
-                    printf("\nInforme a condição médica do paciente: ");
-                    fscanf(arq,"%s", condicaoMed);
-                    raizId = insereNoRec(raizId, id, nome, idade, condicaoMed);
-                    i++;
-                }
+            printf("\n Total de pacientes: ");
+            fscanf(arq,"%d", &totalPacientes);
+            printf("%d", totalPacientes);
+            while(i < totalPacientes){
+                printf("\nInforme os dados do paciente: ");
+                fscanf(arq,"%d %s %d %s", &id, nome, &idade, condicaoMed);
+                printf("\n%d %s %d %s", id, nome, idade, condicaoMed);
+                raizId = insereNoRec(raizId, id, nome, idade, condicaoMed);
+                i++;
+            }
             op3 = 1;    
         }
         break;
@@ -69,15 +66,12 @@ int main()
             i = 0;
             printf("\n Total de pacientes: ");
             fscanf(arq,"%d", &totalPacientes);
+            printf("%d", totalPacientes);
+            printf("ID | Nome | Idade | Condicao Medica");
             while(i < totalPacientes){
-                printf("\nInforme o ID do paciente: ");
-                fscanf(arq,"%d",&id);
-                printf("\nInforme o nome do paciente: ");
-                fscanf(arq,"%s", nome);
-                printf("\nInforme a idade do paciente: ");
-                fscanf(arq,"%d",&idade);
-                printf("\nInforme a condição médica do paciente: ");
-                fscanf(arq,"%s", condicaoMed);
+                printf("\nInforme os dados do paciente: ");
+                fscanf(arq,"%d %s %d %s", &id, nome, &idade, condicaoMed);
+                printf("\n%d %s %d %s", id, nome, idade, condicaoMed);
                 raizNome = insereNoRecNome(raizId, id, nome, idade, condicaoMed);
                 i++;
                 }
@@ -85,22 +79,19 @@ int main()
         }
         break;
         default:
-            printf("\nFalha na inserção!!\n");
+            printf("\nFalha na insercao!!\n");
             break;
         }
     }
 
-    system("cls");
+   //system("cls");
     /////rodara para talvez outra inserçao e busca e remoção
-    while(op!=9)
+    while(op!=5)
     {
-        printf("\n 1-Cadastro de Paciente por ID | 2-Cadastro de Paciente por Nome | 3-Buscar por ID | 4-Buscar por Nome | 5-Remover Paciente | 6-Remover paciente por Nome: | 7-Listar Pacientes por Id | 8-Lista Pacientes por nome | 9-Sair \n");
+        printf("\n 1-Cadastro de Paciente | 2-Buscar | 3-Remover Paciente | 4-Lista Pacientes | 5-Sair \n");
         scanf("%d",&op);
         switch(op)
         {
-            case 0:{
-                ////para o for
-            }break;
             case 1:{
                 printf("\nInforme o ID do paciente: ");
                 scanf("%d",&id);
@@ -108,60 +99,67 @@ int main()
                 scanf("%s", nome);
                 printf("\nInforme a idade do paciente: ");
                 scanf("%d",&idade);
-                printf("\nInforme a condição médica do paciente: ");
+                printf("\nInforme a condicao medica do paciente: ");
                 scanf("%s", condicaoMed);
-
-                raizId = insereNoRec(raizId, id, nome, idade, condicaoMed);
-                raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed);
-
+                if(op2 == 1){
+                    raizId = insereNoRec(raizId, id, nome, idade, condicaoMed);
+                }else if(op2 == 2){
+                    raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed);
+                }
             }break;
             case 2:{
-                printf("nao feito ainda");
+                if(op2 == 1){
+                    printf("\nInforme o ID:");
+                    scanf("%d", &id);
+                    achouId = buscarNoRecId(raizId, id);
+                    if(achouId)
+                    {
+                        printf(" ID: %d | Paciente: %s | Idade: %d | Condicao Medica: %s\n", achouId->id, achouId->nome, achouId->idade, achouId->condicaoMed);
+                    }
+                    else{
+                        printf("\nPaciente nao encontrado!");
+                    }
+                }else if(op2 ==2){
+                    printf("\nInforme o nome do paciente: ");
+                    scanf("%s", nome);
+                    achouNome = buscarNoRecNome(raizNome, nome);
+                    if(achouNome)
+                    {
+                        printf(" ID: %d | Paciente: %s | Idade: %d | Condicao Medica: %s\n", achouNome->id, achouNome->nome, achouNome->idade, achouNome->condicaoMed);
+                    }
+                    else{
+                        printf("\nPaciente nao encontrado!");
+                    }
+                }
             }break;
             case 3:{
-                printf("\nInforme o ID:");
-                scanf("%d", &id);
-                achouId = buscarNoRecId(raizId, id);
-                if(achouId)
-                {
-                    printf(" ID: %d | Paciente: %s | Idade: %d | Condicao Medica: %s\n", achouId->id, achouId->nome, achouId->idade, achouId->condicaoMed);
+                if(op2 == 1){
+                    printf("Informe o ID do paciente a ser removido: ");
+                    scanf("%d",&id);
+                    removeNo(&raizId, id);
+                }else if(op2 == 2){
+                    printf("Informe o nome do paciente a ser removido: ");
+                    scanf("%s", nome);
                 }
-                else
-                    printf("\nPaciente nao encontrado!");
-
             }break;
             case 4:{
-                printf("\nInforme o nome do paciente: ");
-                scanf("%s", nome);
-                achouNome = buscarNoRecNome(raizNome, nome);
-                if(achouNome)
-                {
-                    printf(" ID: %d | Paciente: %s | Idade: %d | Condicao Medica: %s\n", achouNome->id, achouNome->nome, achouNome->idade, achouNome->condicaoMed);
+                if(op2 == 1){
+                    printf("\n Lista por ID: ");
+                    emOrdem(raizId);
+                }else if(op2 == 2){
+                    printf("\n Lista por nome: ");
+                    emOrdem(raizNome);
                 }
-                else
-                    printf("\nPaciente nao encontrado!");
-
-            }break;
-            case 5:{
-                printf("Informe o ID do paciente a ser removido: ");
-                scanf("%d",&id);
-                removeNo(&raizId, id);
-            }break;
-            case 6:{
-                printf("Informe o nome do paciente a ser removido: ");
-                scanf("%s", nome);
-            }break;
-            case 7:{
-                printf("\n Lista por ID: ");
-                emOrdem(raizId);
-            }break;
-            case 8:{
-                printf("\n Lista por nome: ");
-                emOrdem(raizNome);
             }break;
             default:
-            printf("tchau! :)");
+                printf("tchau! :)");
         }
+    }
+
+    if(op2 == 1){    
+        emOrdemArquivo(raizId, log);
+    }else if(op2 == 2){
+        emOrdemArquivo(raizNome, log);
     }
 
     desalocarArvore(raizId);
@@ -255,6 +253,16 @@ void emOrdem(No *raiz){
     }else
     printf("A lista está vazia!\n");
     
+}
+void emOrdemArquivo(No *raiz, FILE *arquivo) {
+    if (raiz != NULL) {
+        emOrdemArquivo(raiz->esq, arquivo);
+        fprintf(arquivo, "ID: %d | Paciente: %s | Idade: %d | Condição Médica: %s\n",
+                raiz->id, raiz->nome, raiz->idade, raiz->condicaoMed);
+        emOrdemArquivo(raiz->dir, arquivo);
+    } else if (arquivo) {
+        fprintf(arquivo, "A lista está vazia!\n");
+    }
 }
 
 No **buscaPai(No **raiz, int k)
