@@ -14,7 +14,7 @@ typedef struct no{
 No *alocaNo(int id, char nome[], int idade, char condicaoMed[]);
 No **ppMenor(No **raiz);
 void emOrdem(No *raiz);
-void emOrdemArquivo(No *raiz, FILE *arquivo);
+void emOrdemArquivo(No *raiz, FILE *arquivo, int *totalP);
 void desalocarArvore(No *no);
 //// Funções de ID
 No *insereNoRecId(No *raiz, int id, char nome[], int idade, char condicaoMed[]);
@@ -179,14 +179,15 @@ int main()
         }
     }
 
+    int *totalP = NULL;
     if(op2 == 1){    
-        emOrdemArquivo(raizId, log);
+        emOrdemArquivo(raizId, log, &totalP);
         printf("\nGravando lista em arquivo....");
     }else if(op2 == 2){
-        emOrdemArquivo(raizNome, log);
+        emOrdemArquivo(raizNome, log, &totalP);
         printf("\nGravando lista em arquivo....");
     }
-    fprintf(log, "Total de Pacientes %d", totalPacientes);
+    fprintf(log, "Total de Pacientes %d", *totalP);
 
     desalocarArvore(raizId);
     desalocarArvore(raizNome);
@@ -211,16 +212,45 @@ No *alocaNo(int id, char nome[], int idade, char condicaoMed[])
     return novo;
 }
 
-int idExistente(No *raiz, int id) {
-    if (raiz == NULL) {
-        return 0;
+No **ppMenor(No **raiz)//a entrada e o lado direito da arvore
+{
+    No **pmenor=raiz;
+    while((*pmenor)->esq)
+    {
+        pmenor = &(*pmenor)->esq;
     }
-    if (raiz->id == id) {
-        return 1;
+    return pmenor;
+}
+//esq, raiz, dir
+void emOrdem(No *raiz){
+    if (raiz != NULL) {
+        emOrdem(raiz->esq);
+        printf(" ID:%d | Paciente:%s | Idade:%d | Condicao Medica: %s\n", raiz->id, raiz->nome, raiz->idade, raiz->condicaoMed);
+        emOrdem(raiz->dir);
     }
-    return (id < raiz->id) ? idExistente(raiz->esq, id) : idExistente(raiz->dir, id);
 }
 
+void emOrdemArquivo(No *raiz, FILE *arquivo, int *totalP) {
+    if (raiz != NULL) {
+        emOrdemArquivo(raiz->esq, arquivo, totalP);
+        fprintf(arquivo, "ID: %d | Paciente: %s | Idade: %d | Condicao Medica: %s\n",
+                raiz->id, raiz->nome, raiz->idade, raiz->condicaoMed);
+        (*totalP)++;
+        emOrdemArquivo(raiz->dir, arquivo, totalP);
+    }
+}
+
+void desalocarArvore(No *no) {
+    if (no == NULL) {
+        return;
+    }
+    desalocarArvore(no->esq);
+    desalocarArvore(no->dir);
+    free(no);
+    no = NULL;
+}
+
+///Funcoes ID
 No *insereNoRecId(No *raiz, int id, char nome[], int idade, char condicaoMed[]) {
     if (raiz == NULL) {
         return alocaNo(id, nome, idade, condicaoMed);  
@@ -270,74 +300,14 @@ No *buscarNoRecId(No *raiz, int id)
     }
 }
 
-int nomeExistente(No *raiz, char nome[]) {
+int idExistente(No *raiz, int id) {
     if (raiz == NULL) {
-        return 0; 
+        return 0;
     }
-    if (strcmp(raiz->nome, nome) == 0) {
-        return 1; 
+    if (raiz->id == id) {
+        return 1;
     }
-    return (strcmp(nome, raiz->nome) < 0) ? nomeExistente(raiz->esq, nome) : nomeExistente(raiz->dir, nome);
-}
-
-No* insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]) {
-    if (raiz == NULL) {
-        return alocaNo(id, nome, idade, condicaoMed);
-    } else {
-        if (nomeExistente(raiz, nome)) {
-            if (id == raiz->id) {
-                printf("Paciente ja inserido!\n");
-            }else {
-                int cmp = strcmp(nome, raiz->nome);
-                if (cmp < 0) {
-                    raiz->esq = insereNoRecNome(raiz->esq, id, nome, idade, condicaoMed);
-                } else {
-                    raiz->dir = insereNoRecNome(raiz->dir, id, nome, idade, condicaoMed);
-                }
-            }
-        } else {
-            int cmp = strcmp(nome, raiz->nome);
-            if (cmp < 0) {
-                raiz->esq = insereNoRecNome(raiz->esq, id, nome, idade, condicaoMed);
-            } else {
-                raiz->dir = insereNoRecNome(raiz->dir, id, nome, idade, condicaoMed);
-            }
-        }
-    }
-    return raiz;
-}
-
-No *buscarNoRecNome(No *raiz, char nome[])
-{
-    //caso base 1
-    if(raiz == NULL)
-        return NULL;
-    //caso base 2
-    if(strcmp(nome, raiz->nome) == 0)
-        return raiz;
-    else
-    {
-        if(strcmp(nome, raiz->nome) < 0)
-            return buscarNoRecNome(raiz->esq, nome);
-        else
-            return buscarNoRecNome(raiz->dir, nome);
-    }
-}
-//esq, raiz, dir
-void emOrdem(No *raiz){
-    if (raiz != NULL) {
-        emOrdem(raiz->esq);
-        printf(" ID:%d | Paciente:%s | Idade:%d | Condicao Medica: %s\n", raiz->id, raiz->nome, raiz->idade, raiz->condicaoMed);
-        emOrdem(raiz->dir);
-    }
-}
-void emOrdemArquivo(No *raiz, FILE *arquivo) {
-    if (raiz != NULL) {
-        emOrdemArquivo(raiz->esq, arquivo);
-        fprintf(arquivo, "ID: %d | Paciente: %s | Idade: %d | Condicao Medica: %s\n",
-                raiz->id, raiz->nome, raiz->idade, raiz->condicaoMed);
-        emOrdemArquivo(raiz->dir, arquivo);
-    }
+    return (id < raiz->id) ? idExistente(raiz->esq, id) : idExistente(raiz->dir, id);
 }
 
 No **buscaPaiId(No **raiz, int k)
@@ -356,15 +326,6 @@ No **buscaPaiId(No **raiz, int k)
   return raiz;
 }
 
-No **ppMenor(No **raiz)//a entrada e o lado direito da arvore
-{
-    No **pmenor=raiz;
-    while((*pmenor)->esq)
-    {
-        pmenor = &(*pmenor)->esq;
-    }
-    return pmenor;
-}
 void removeNoId(No **raiz, int k)
 {
     No **pai=NULL;
@@ -419,6 +380,62 @@ void removeNoId(No **raiz, int k)
         }
     }
 }
+
+/// Funcoes NOME
+No* insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]) {
+    if (raiz == NULL) {
+        return alocaNo(id, nome, idade, condicaoMed);
+    } else {
+        if (nomeExistente(raiz, nome)) {
+            if (id == raiz->id) {
+                printf("Paciente ja inserido!\n");
+            }else {
+                int cmp = strcmp(nome, raiz->nome);
+                if (cmp < 0) {
+                    raiz->esq = insereNoRecNome(raiz->esq, id, nome, idade, condicaoMed);
+                } else {
+                    raiz->dir = insereNoRecNome(raiz->dir, id, nome, idade, condicaoMed);
+                }
+            }
+        } else {
+            int cmp = strcmp(nome, raiz->nome);
+            if (cmp < 0) {
+                raiz->esq = insereNoRecNome(raiz->esq, id, nome, idade, condicaoMed);
+            } else {
+                raiz->dir = insereNoRecNome(raiz->dir, id, nome, idade, condicaoMed);
+            }
+        }
+    }
+    return raiz;
+}
+
+No *buscarNoRecNome(No *raiz, char nome[])
+{
+    //caso base 1
+    if(raiz == NULL)
+        return NULL;
+    //caso base 2
+    if(strcmp(nome, raiz->nome) == 0)
+        return raiz;
+    else
+    {
+        if(strcmp(nome, raiz->nome) < 0)
+            return buscarNoRecNome(raiz->esq, nome);
+        else
+            return buscarNoRecNome(raiz->dir, nome);
+    }
+}
+
+int nomeExistente(No *raiz, char nome[]) {
+    if (raiz == NULL) {
+        return 0; 
+    }
+    if (strcmp(raiz->nome, nome) == 0) {
+        return 1; 
+    }
+    return (strcmp(nome, raiz->nome) < 0) ? nomeExistente(raiz->esq, nome) : nomeExistente(raiz->dir, nome);
+}
+
 No **buscaPaiNome(No **raiz, char nome[])
 {
   if (*raiz == NULL)
@@ -434,6 +451,7 @@ No **buscaPaiNome(No **raiz, char nome[])
   }
   return raiz;
 }
+
 void removeNoNome(No **raiz, char nome[])
 {
     No **pai=NULL;
@@ -487,13 +505,4 @@ void removeNoNome(No **raiz, char nome[])
             printf("\nRemovido com Sucesso!\n");
         }
     }
-}
-void desalocarArvore(No *no) {
-    if (no == NULL) {
-        return;
-    }
-    desalocarArvore(no->esq);
-    desalocarArvore(no->dir);
-    free(no);
-    no = NULL;
 }
