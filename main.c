@@ -91,9 +91,9 @@ int main()
             printf("\n Total de pacientes: ");
             fscanf(arq,"%d", &totalPacientes);
             printf("%d", totalPacientes);
+            printf("\nInforme os dados do paciente: ");
             printf("ID | Nome | Idade | Condicao Medica");
             while(i < totalPacientes){
-                printf("\nInforme os dados do paciente: ");
                 fscanf(arq,"%d %s %d %s", &id, nome, &idade, condicaoMed);
                 printf("\n%d %s %d %s", id, nome, idade, condicaoMed);
                 raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed);
