@@ -12,22 +12,22 @@ typedef struct no{
 }No;
 
 No *alocaNo(int id, char nome[], int idade, char condicaoMed[]);
+No **ppMenor(No **raiz);
+void emOrdem(No *raiz);
+void emOrdemArquivo(No *raiz, FILE *arquivo);
+void desalocarArvore(No *no);
 //// Funções de ID
 No *insereNoRecId(No *raiz, int id, char nome[], int idade, char condicaoMed[]);
 No *buscarNoRecId(No *raiz, int id);
 int idExistente(No *raiz, int id);
+No **buscaPaiId(No **raiz, int k);
+void removeNoId(No **raiz, int k);
 //// Funções de Nome
 No *insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]);
 No *buscarNoRecNome(No *raiz, char nome[]);
-
-void emOrdem(No *raiz);
-void emOrdemArquivo(No *raiz, FILE *arquivo);
-void desalocarArvore(No *no);
-
-///renomear busca pai para buscaporID
-No **buscaPai(No **raiz, int k);
-void removeNo(No **raiz, int k);
-No **ppMenor(No **raiz);
+int nomeExistente(No *raiz, char nome[]);
+No **buscaPaiNome(No **raiz, char nome[]);
+void removeNoNome(No **raiz, char nome[]);
 
 int main()
 {
@@ -53,16 +53,36 @@ int main()
         switch(op2)
         {
         case 1:{
-            printf("\nTotal de pacientes: ");
+            printf("\nRecebendo total de pacientes: ");
             fscanf(arq,"%d", &totalPacientes);
-            printf("%d", totalPacientes);
             while(i < totalPacientes){
                 printf("\nDados do paciente: ");
-                fscanf(arq,"%d %s %d %s", &id, nome, &idade, condicaoMed);
+                int res = fscanf(arq, "%d %s %d %s", &id, nome, &idade, condicaoMed);
+                if (res != 4) {
+                    printf("\nErro: número de registros no arquivo é menor que o total de pacientes informado.\n");
+                    break;
+                }
                 printf("\n%d %s %d %s", id, nome, idade, condicaoMed);
                 raizId = insereNoRecId(raizId, id, nome, idade, condicaoMed);
                 i++;
             }
+                if (i < totalPacientes) {
+                    printf("\nAviso: Nem todos os pacientes informados foram processados. Total no arquivo menor que o informado.\n");
+                } else if (!feof(arq)) {
+                    int op4 = 1;
+                    printf("\nAviso: O arquivo contém mais registros que o total de pacientes informado.Deseja adicionar?(1 - Sim 2 - Não)\n");
+                    scanf("%d", &op4);
+                    if(op4 == 1){
+                        while (fscanf(arq, "%d %s %d %s", &id, nome, &idade, condicaoMed) == 4) {
+                            printf("\nDados do paciente: %d %s %d %s", id, nome, idade, condicaoMed);
+                            raizId = insereNoRecId(raizId, id, nome, idade, condicaoMed);
+                            i++;
+                        }
+                    }else{
+                        printf("\nRegistros adicionais Incompletos.\n");
+                    }
+                }
+            printf("\nTotal de pacientes registrados: %d\n", i);
             op3 = 1;    
         }
         break;
@@ -138,11 +158,11 @@ int main()
                 if(op2 == 1){
                     printf("Informe o ID do paciente a ser removido: ");
                     scanf("%d",&id);
-                    removeNo(&raizId, id);
+                    removeNoId(&raizId, id);
                 }else if(op2 == 2){
                     printf("Informe o nome do paciente a ser removido: ");
                     scanf("%s", nome);
-                    ////tem que fazer
+                    removeNoNome(&raizNome, nome);
                 }
             }break;
             case 4:{
@@ -166,6 +186,7 @@ int main()
         emOrdemArquivo(raizNome, log);
         printf("\nGravando lista em arquivo....");
     }
+    fprintf(log, "Total de Pacientes %d", totalPacientes);
 
     desalocarArvore(raizId);
     desalocarArvore(raizNome);
@@ -212,7 +233,7 @@ No *insereNoRecId(No *raiz, int id, char nome[], int idade, char condicaoMed[]) 
                 int novoId = id;
                 do {
                     novoId++; 
-                    printf("O ID ja existe. Tentando o ID %d...\n", id, novoId);
+                    printf("O ID ja existe. Tentando o ID %d...\n", novoId);
                 } while (idExistente(raiz, novoId));  
                 
                 printf("Novo ID disponivel: %d. Inserindo o paciente com esse ID.\n", novoId);
@@ -286,7 +307,6 @@ No* insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]
     return raiz;
 }
 
-
 No *buscarNoRecNome(No *raiz, char nome[])
 {
     //caso base 1
@@ -317,10 +337,10 @@ void emOrdemArquivo(No *raiz, FILE *arquivo) {
         fprintf(arquivo, "ID: %d | Paciente: %s | Idade: %d | Condicao Medica: %s\n",
                 raiz->id, raiz->nome, raiz->idade, raiz->condicaoMed);
         emOrdemArquivo(raiz->dir, arquivo);
-    } 
+    }
 }
 
-No **buscaPai(No **raiz, int k)
+No **buscaPaiId(No **raiz, int k)
 {
   if (*raiz == NULL)
     return NULL;
@@ -335,7 +355,8 @@ No **buscaPai(No **raiz, int k)
   }
   return raiz;
 }
-No **ppMenor(No **raiz)//a entrada e o lado direito da �rvore
+
+No **ppMenor(No **raiz)//a entrada e o lado direito da arvore
 {
     No **pmenor=raiz;
     while((*pmenor)->esq)
@@ -344,12 +365,12 @@ No **ppMenor(No **raiz)//a entrada e o lado direito da �rvore
     }
     return pmenor;
 }
-void removeNo(No **raiz, int k)
+void removeNoId(No **raiz, int k)
 {
     No **pai=NULL;
     if((*raiz) == NULL)
         return;
-    pai = buscaPai(raiz, k);
+    pai = buscaPaiId(raiz, k);
     //1o caso --> remover no folha
     if((*pai)->esq == NULL && (*pai)->dir == NULL)
     {
@@ -392,7 +413,76 @@ void removeNo(No **raiz, int k)
                 //substituiDados
                 (*pai)->id = (*paux)->id;
                 printf("\ntrocou chave...");
-                removeNo(paux, (*paux)->id);
+                removeNoId(paux, (*paux)->id);
+            }
+            printf("\nRemovido com Sucesso!\n");
+        }
+    }
+}
+No **buscaPaiNome(No **raiz, char nome[])
+{
+  if (*raiz == NULL)
+    return NULL;
+  while(*raiz!=NULL)
+  {
+      if(strcmp((*raiz)->nome, nome) == 0)
+        return raiz;
+      if(strcmp((*raiz)->nome, nome) < 0){
+        raiz = &((*raiz)->dir);
+      }else
+        raiz = &((*raiz)->esq);
+  }
+  return raiz;
+}
+void removeNoNome(No **raiz, char nome[])
+{
+    No **pai=NULL;
+    if((*raiz) == NULL)
+        return;
+    pai = buscaPaiNome(raiz, nome);
+    //1o caso --> remover no folha
+    if((*pai)->esq == NULL && (*pai)->dir == NULL)
+    {
+        free(*pai);
+        *pai = NULL;
+        return;
+    }
+    //2o caso --> remover pai com 1 filho apenas
+    else{
+        if((((*pai)->esq == NULL ) && ((*pai)->dir !=NULL)) || (((*pai)->esq != NULL) && ((*pai)->dir ==NULL)))
+        {
+            if((*pai)->esq != NULL)
+            {
+                No *paux=(*pai);
+                *pai = (*pai)->esq;
+                free(paux);
+                
+            }
+            if((*pai)->dir != NULL)
+            {
+                No *paux=(*pai);
+                *pai = (*pai)->dir;
+                printf("Paciente sendo removido: %s\n", paux->nome);
+                free(paux);
+                paux = NULL;
+                if(paux){
+                    printf("a Remocao deu errado!\n");
+                }else
+                printf("Remocao realizada!\n");
+            }
+            return;
+        }
+        //    3o caso --> remover pai com 2 filhos
+        else{
+            if((*pai)->esq != NULL && (*pai)->dir!=NULL)
+            {
+                No **paux = ppMenor(&(*pai)->dir);
+                printf("\n %s", (*paux)->nome);
+                printf("\nMenor %s %p", (*paux)->nome, paux);
+                //substituiDados
+                (*pai)->id = (*paux)->id;
+                printf("\ntrocou chave...");
+                removeNoNome(paux, (*paux)->nome);
             }
             printf("\nRemovido com Sucesso!\n");
         }
