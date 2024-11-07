@@ -44,16 +44,16 @@ int main()
         }
     while (op3 == 0){
         printf("Deseja inserir por:\n");
-        printf(" 1 - ID\n 2-Nome\n");
+        printf(" 1- ID \n 2- Nome\n");
         scanf("%d", &op2);
         switch(op2)
         {
         case 1:{
-            printf("\n Total de pacientes: ");
+            printf("\nTotal de pacientes: ");
             fscanf(arq,"%d", &totalPacientes);
             printf("%d", totalPacientes);
             while(i < totalPacientes){
-                printf("\nInforme os dados do paciente: ");
+                printf("\nDados do paciente: ");
                 fscanf(arq,"%d %s %d %s", &id, nome, &idade, condicaoMed);
                 printf("\n%d %s %d %s", id, nome, idade, condicaoMed);
                 raizId = insereNoRec(raizId, id, nome, idade, condicaoMed);
@@ -84,8 +84,6 @@ int main()
         }
     }
 
-   //system("cls");
-    /////rodara para talvez outra inserçao e busca e remoção
     while(op!=5)
     {
         printf("\n 1-Cadastro de Paciente | 2-Buscar | 3-Remover Paciente | 4-Lista Pacientes | 5-Sair \n");
@@ -144,10 +142,10 @@ int main()
             }break;
             case 4:{
                 if(op2 == 1){
-                    printf("\n Lista por ID: ");
+                    printf("\n Lista por ID: \n");
                     emOrdem(raizId);
                 }else if(op2 == 2){
-                    printf("\n Lista por nome: ");
+                    printf("\n Lista por nome: \n");
                     emOrdem(raizNome);
                 }
             }break;
@@ -158,8 +156,10 @@ int main()
 
     if(op2 == 1){    
         emOrdemArquivo(raizId, log);
+        printf("\nGravando lista em arquivo....");
     }else if(op2 == 2){
         emOrdemArquivo(raizNome, log);
+        printf("\nGravando lista em arquivo....");
     }
 
     desalocarArvore(raizId);
@@ -248,21 +248,17 @@ No *buscarNoRecNome(No *raiz, char nome[])
 void emOrdem(No *raiz){
     if (raiz != NULL) {
         emOrdem(raiz->esq);
-        printf(" ID:%d | Paciente:%s | Idade:%d | Condição Médica: %s\n", raiz->id, raiz->nome, raiz->idade, raiz->condicaoMed);
+        printf(" ID:%d | Paciente:%s | Idade:%d | Condicao Medica: %s\n", raiz->id, raiz->nome, raiz->idade, raiz->condicaoMed);
         emOrdem(raiz->dir);
-    }else
-    printf("A lista está vazia!\n");
-    
+    }
 }
 void emOrdemArquivo(No *raiz, FILE *arquivo) {
     if (raiz != NULL) {
         emOrdemArquivo(raiz->esq, arquivo);
-        fprintf(arquivo, "ID: %d | Paciente: %s | Idade: %d | Condição Médica: %s\n",
+        fprintf(arquivo, "ID: %d | Paciente: %s | Idade: %d | Condicao Medica: %s\n",
                 raiz->id, raiz->nome, raiz->idade, raiz->condicaoMed);
         emOrdemArquivo(raiz->dir, arquivo);
-    } else if (arquivo) {
-        fprintf(arquivo, "A lista está vazia!\n");
-    }
+    } 
 }
 
 No **buscaPai(No **raiz, int k)
@@ -280,7 +276,7 @@ No **buscaPai(No **raiz, int k)
   }
   return raiz;
 }
-No **ppMenor(No **raiz)//a entrada � o lado direito da �rvore
+No **ppMenor(No **raiz)//a entrada e o lado direito da �rvore
 {
     No **pmenor=raiz;
     while((*pmenor)->esq)
@@ -319,10 +315,11 @@ void removeNo(No **raiz, int k)
                 *pai = (*pai)->dir;
                 printf("Paciente sendo removido: %s\n", paux->nome);
                 free(paux);
+                paux = NULL;
                 if(paux){
-                    printf("a Remoção deu errado!\n");
+                    printf("a Remocao deu errado!\n");
                 }else
-                printf("Remoção realizada!\n");
+                printf("Remocao realizada!\n");
             }
             return;
         }
