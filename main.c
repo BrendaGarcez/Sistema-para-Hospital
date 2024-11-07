@@ -75,11 +75,12 @@ int main()
                 if (i < totalPacientes) {
                     printf("\nAviso: Nem todos os pacientes informados foram processados. Total no arquivo menor que o informado.\n");
                 } 
-                if (res == 4) {
+                if (res == EOF && !feof(arq)) {
                     int op4 = 1;
                     printf("\nAviso: O arquivo contem mais registros que o total de pacientes informado. Deseja adicionar?(1 - Sim 2 - Nao)\n");
                     scanf("%d", &op4);
                     if (op4 == 1) {
+                        
                         while (fscanf(arq, "%d %s %d %s", &id, nome, &idade, condicaoMed) == 4) {
                             printf("\n%d | %s | %d | %s", id, nome, idade, condicaoMed);
                             raizId = insereNoRecId(raizId, id, nome, idade, condicaoMed, iContador);
@@ -98,32 +99,36 @@ int main()
             printf("%d", totalPacientes);
             printf("\nDados dos pacientes: ");
             printf("ID | Nome | Idade | Condicao Medica");
-            while(i < totalPacientes){
-                int res = fscanf(arq, "%d %s %d %s", &id, nome, &idade, condicaoMed);
-                if (res != 4) {
-                    printf("\nErro: numero de registros no arquivo e menor que o total de pacientes informado.\n");
-                    break;
-                }
+            int res;
+            while(i < totalPacientes && (res = fscanf(arq, "%d %s %d %s", &id, nome, &idade, condicaoMed ))== 4)
+            {
                 printf("\n%d %s %d %s", id, nome, idade, condicaoMed);
                 raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed, iContador);
+                i++;
+            }
+            if (res != 4) {
+                printf("\nErro: numero de registros no arquivo e menor que o total de pacientes informado.\n");
+                break;
             }
                 if (i < totalPacientes) {
                     printf("\nAviso: Nem todos os pacientes informados foram processados. Total no arquivo menor que o informado.\n");
-                } else if (!feof(arq)) {
+                } 
+                if (res == EOF && !feof(arq)) {
                     int op4 = 1;
-                    printf("\nAviso: O arquivo contem mais registros que o total de pacientes informado. Deseja adicionar?(1 - Sim 2 - Não)\n");
+                    printf("\nAviso: O arquivo contem mais registros que o total de pacientes informado. Deseja adicionar?(1 - Sim 2 - Nao)\n");
                     scanf("%d", &op4);
-                    if(op4 == 1){
+                    if (op4 == 1) {
+                        
                         while (fscanf(arq, "%d %s %d %s", &id, nome, &idade, condicaoMed) == 4) {
-                            printf("\n %d | %s | %d | %s", id, nome, idade, condicaoMed);
+                            printf("\n%d | %s | %d | %s", id, nome, idade, condicaoMed);
                             raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed, iContador);
                         }
-                    }else{
-                        printf("\nRegistros adicionais Incompletos.\n");
+                    } else {
+                        printf("\nRegistros adicionais incompletos.\n");
                     }
                 }
             printf("\nTotal de pacientes registrados: %d\n", i);
-            op3 = 1;   
+            op3 = 1;    
         }
         break;
         default:
@@ -499,6 +504,7 @@ void removeNoNome(No **raiz, char nome[], int *i)
     {
         free(*pai);
         *pai = NULL;
+        (*i)--; 
         return;
     }
     //2o caso --> remover pai com 1 filho apenas
@@ -510,7 +516,8 @@ void removeNoNome(No **raiz, char nome[], int *i)
                 No *paux=(*pai);
                 *pai = (*pai)->esq;
                 free(paux);
-                
+                paux = NULL;
+                printf("Remocao realizada!\n");
             }
             if((*pai)->dir != NULL)
             {
@@ -519,6 +526,7 @@ void removeNoNome(No **raiz, char nome[], int *i)
                 printf("Paciente sendo removido: %s\n", paux->nome);
                 free(paux);
                 paux = NULL;
+                (*i)--;
                 if(paux){
                     printf("a Remocao deu errado!\n");
                 }else
@@ -531,11 +539,11 @@ void removeNoNome(No **raiz, char nome[], int *i)
             if((*pai)->esq != NULL && (*pai)->dir!=NULL)
             {
                 No **paux = ppMenor(&(*pai)->dir);
-                printf("\n %s", (*paux)->nome);
-                printf("\nMenor %s %p", (*paux)->nome, paux);
-                //substituiDados
+                printf("\n %d", (*paux)->id);
                 (*pai)->id = (*paux)->id;
-                printf("\ntrocou chave...");
+                strcpy((*pai)->nome, (*paux)->nome);
+                (*pai)->idade = (*paux)->idade;
+                strcpy((*pai)->condicaoMed, (*paux)->condicaoMed);
                 removeNoNome(paux, (*paux)->nome, i);
             }
             printf("\nRemovido com Sucesso!\n");
