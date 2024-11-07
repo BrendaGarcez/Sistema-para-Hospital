@@ -76,7 +76,7 @@ int main()
                 printf("\nInforme os dados do paciente: ");
                 fscanf(arq,"%d %s %d %s", &id, nome, &idade, condicaoMed);
                 printf("\n%d %s %d %s", id, nome, idade, condicaoMed);
-                raizNome = insereNoRecNome(raizId, id, nome, idade, condicaoMed);
+                raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed);
                 i++;
                 }
             op3 = 1;   
@@ -212,7 +212,7 @@ No *insereNoRecId(No *raiz, int id, char nome[], int idade, char condicaoMed[]) 
                 int novoId = id;
                 do {
                     novoId++; 
-                    printf("O ID %d ja existe. Tentando o ID %d...\n", id, novoId);
+                    printf("O ID ja existe. Tentando o ID %d...\n", id, novoId);
                 } while (idExistente(raiz, novoId));  
                 
                 printf("Novo ID disponivel: %d. Inserindo o paciente com esse ID.\n", novoId);
