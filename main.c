@@ -24,7 +24,7 @@ int idExistente(No *raiz, int id);
 No **buscaPaiId(No **raiz, int k);
 void removeNoId(No **raiz, int k, int *i);
 //// Funções de Nome
-No *insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[], int *i);
+No *insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]);
 No *buscarNoRecNome(No *raiz, char nome[]);
 No **buscaPaiNome(No **raiz, char nome[]);
 void removeNoNome(No **raiz, char nome[], int *i);
@@ -66,7 +66,7 @@ int main()
             {
                 printf("\n%d %s %d %s", id, nome, idade, condicaoMed);
                 raizId = insereNoRecId(raizId, id, nome, idade, condicaoMed, iContador);
-                i++;
+               // i++;
             }
             if (res != 4) {
                 printf("\nErro: numero de registros no arquivo e menor que o total de pacientes informado.\n");
@@ -103,7 +103,7 @@ int main()
             while(i < totalPacientes && (res = fscanf(arq, "%d %s %d %s", &id, nome, &idade, condicaoMed ))== 4)
             {
                 printf("\n%d %s %d %s", id, nome, idade, condicaoMed);
-                raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed, iContador);
+                raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed);
                 i++;
             }
             if (res != 4) {
@@ -121,7 +121,7 @@ int main()
                         
                         while (fscanf(arq, "%d %s %d %s", &id, nome, &idade, condicaoMed) == 4) {
                             printf("\n%d | %s | %d | %s", id, nome, idade, condicaoMed);
-                            raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed, iContador);
+                            raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed);
                         }
                     } else {
                         printf("\nRegistros adicionais incompletos.\n");
@@ -155,7 +155,7 @@ int main()
                 if(op2 == 1){
                     raizId = insereNoRecId(raizId, id, nome, idade, condicaoMed, iContador);
                 }else if(op2 == 2){
-                    raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed, iContador);
+                    raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed);
                 }
             }break;
             case 2:{
@@ -337,7 +337,7 @@ int idExistente(No *raiz, int id) {
     if (raiz->id == id) {
         return 1;
     }
-    return (id < raiz->id) ? idExistente(raiz->esq, id) : idExistente(raiz->dir, id);
+    return idExistente(raiz->esq, id) || idExistente(raiz->dir, id);
 }
 
 No **buscaPaiId(No **raiz, int k)
@@ -412,17 +412,20 @@ void removeNoId(No **raiz, int k, int *i)
 int geraNovoId(No* raiz, int id) {
     int novoId = id;
     while (idExistente(raiz, novoId)) {
-        printf("ID ja existente. Gerando novo ID...\n");
+        printf("ID %d ja existente. Gerando novo ID...\n", novoId);
         novoId++;
     }
     return novoId;
 }
 
 /// Funcoes NOME
-No* insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[], int *i) {
+No* insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]) {
     if (raiz == NULL) {
         return alocaNo(id, nome, idade, condicaoMed);
-        (*i)++;
+    }
+
+    if (idExistente(raiz, id)) {
+        id = geraNovoId(raiz, id);
     }
 
     if (strcmp(nome, raiz->nome) == 0) {
@@ -435,9 +438,9 @@ No* insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]
                 strcat(nome, "(1)");
                 int cmp = strcmp(nome, raiz->nome);
                 if (cmp < 0) {
-                    raiz->esq = insereNoRecNome(raiz->esq, id, nome, idade, condicaoMed, i);
+                    raiz->esq = insereNoRecNome(raiz->esq, id, nome, idade, condicaoMed);
                 } else {
-                    raiz->dir = insereNoRecNome(raiz->dir, id, nome, idade, condicaoMed, i);
+                    raiz->dir = insereNoRecNome(raiz->dir, id, nome, idade, condicaoMed);
                 }
             } else {
                 printf("Paciente com o mesmo nome, mas idade maior nao sera inserido.\n");
@@ -445,15 +448,12 @@ No* insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]
             return raiz; 
         }
     }
-    if (idExistente(raiz, id)) {
-        printf("ID ja existente! Atribuindo novo ID...\n");
-        id = geraNovoId(raiz, id);
-    }
+    
     int cmp = strcmp(nome, raiz->nome);
     if (cmp < 0) {
-        raiz->esq = insereNoRecNome(raiz->esq, id, nome, idade, condicaoMed, i);
+        raiz->esq = insereNoRecNome(raiz->esq, id, nome, idade, condicaoMed);
     } else {
-        raiz->dir = insereNoRecNome(raiz->dir, id, nome, idade, condicaoMed, i);
+        raiz->dir = insereNoRecNome(raiz->dir, id, nome, idade, condicaoMed);
     }
     
     return raiz;
