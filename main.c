@@ -66,7 +66,7 @@ int main()
             {
                 printf("\n%d %s %d %s", id, nome, idade, condicaoMed);
                 raizId = insereNoRecId(raizId, id, nome, idade, condicaoMed, iContador);
-               // i++;
+                i++;
             }
             if (res != 4) {
                 printf("\nErro: numero de registros no arquivo e menor que o total de pacientes informado.\n");
