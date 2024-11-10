@@ -14,7 +14,7 @@ typedef struct no{
 No *alocaNo(int id, char nome[], int idade, char condicaoMed[]);
 No **ppMenor(No **raiz);
 void emOrdem(No *raiz);
-void emOrdemArquivo(No *raiz, FILE *arquivo);
+void emOrdemArquivo(No *raiz, FILE *arquivo, int *i);
 void desalocarArvore(No *no);
 int geraNovoId(No* raiz, int id);
 //// Funções de ID
@@ -208,15 +208,17 @@ int main()
                 printf("tchau! :)");
         }
     }
-
+    int j = 0;
+    int *iContando = NULL;
+    iContando = &j;
     if(op2 == 1){    
-        emOrdemArquivo(raizId, log);
+        emOrdemArquivo(raizId, log, iContando);
         printf("\nGravando lista em arquivo....");
     }else if(op2 == 2){
-        emOrdemArquivo(raizNome, log);
+        emOrdemArquivo(raizNome, log, iContando);
         printf("\nGravando lista em arquivo....");
     }
-    fprintf(log, "Total de Pacientes %d", i);
+    fprintf(log, "Total de Pacientes %d", j);
 
     desalocarArvore(raizId);
     desalocarArvore(raizNome);
@@ -259,12 +261,13 @@ void emOrdem(No *raiz){
     }
 }
 
-void emOrdemArquivo(No *raiz, FILE *arquivo) {
+void emOrdemArquivo(No *raiz, FILE *arquivo, int *i) {
     if (raiz != NULL) {
-        emOrdemArquivo(raiz->esq, arquivo);
+        emOrdemArquivo(raiz->esq, arquivo, i);
         fprintf(arquivo, "ID: %d | Paciente: %s | Idade: %d | Condicao Medica: %s\n",
                 raiz->id, raiz->nome, raiz->idade, raiz->condicaoMed);
-        emOrdemArquivo(raiz->dir, arquivo);
+        (*i)++;
+        emOrdemArquivo(raiz->dir, arquivo, i);
     }
 }
 
@@ -292,7 +295,7 @@ No *insereNoRecId(No *raiz, int id, char nome[], int idade, char condicaoMed[], 
                 int novoId = id;
                 do {
                     novoId++; 
-                    printf("O ID ja existe. Tentando o ID %d...\n", novoId);
+                    printf("\nO ID ja existe. Tentando o ID %d...\n", novoId);
                 } while (idExistente(raiz, novoId));  
                 novoId = geraNovoId(raiz, novoId);
 
