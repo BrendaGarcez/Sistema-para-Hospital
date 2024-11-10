@@ -412,7 +412,7 @@ void removeNoId(No **raiz, int k, int *i)
 int geraNovoId(No* raiz, int id) {
     int novoId = id;
     while (idExistente(raiz, novoId)) {
-        printf("ID ja existente. Gerando novo ID...\n");
+        printf("ID ja existente. Atribuindo ID: %d...\n", novoId++);
         novoId++;
     }
     return novoId;
@@ -455,7 +455,7 @@ No* insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]
     } else {
         raiz->dir = insereNoRecNome(raiz->dir, id, nome, idade, condicaoMed, i);
     }
-    
+    printf("Atribuindo ID [%d]\n", id);
     return raiz;
 }
 
