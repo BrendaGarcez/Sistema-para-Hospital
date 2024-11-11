@@ -1,6 +1,4 @@
 
-/*Desenvolvido por: Brenda Amanda da Silva Garcez e Nicole Lousie Matias Jamuchewski*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,7 +15,7 @@ typedef struct no{
 No *alocaNo(int id, char nome[], int idade, char condicaoMed[]);
 No **ppMenor(No **raiz);
 void emOrdem(No *raiz);
-void emOrdemArquivo(No *raiz, FILE *arquivo);
+void emOrdemArquivo(No *raiz, FILE *arquivo, int *i);
 void desalocarArvore(No *no);
 int geraNovoId(No* raiz, int id);
 //// Funções de ID
@@ -27,7 +25,7 @@ int idExistente(No *raiz, int id);
 No **buscaPaiId(No **raiz, int k);
 void removeNoId(No **raiz, int k, int *i);
 //// Funções de Nome
-No *insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]);
+No *insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[], int *i);
 No *buscarNoRecNome(No *raiz, char nome[]);
 No **buscaPaiNome(No **raiz, char nome[]);
 void removeNoNome(No **raiz, char nome[], int *i);
@@ -38,8 +36,8 @@ int main()
     int *iContador = NULL;
     int op=1, op2, op3 = 0, id, idade, totalPacientes, i = 0;
     char nome[20], condicaoMed[20];
+    i = 0;
     iContador = &i;
-
         FILE *log = NULL, *arq = NULL;
         log = fopen("Arquivo de saida.txt", "w");
         if (!log) {
@@ -106,7 +104,7 @@ int main()
             while(i < totalPacientes && (res = fscanf(arq, "%d %s %d %s", &id, nome, &idade, condicaoMed ))== 4)
             {
                 printf("\n%d %s %d %s", id, nome, idade, condicaoMed);
-                raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed);
+                raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed, iContador);
                 i++;
             }
             if (res != 4) {
@@ -124,7 +122,7 @@ int main()
 
                         while (fscanf(arq, "%d %s %d %s", &id, nome, &idade, condicaoMed) == 4) {
                             printf("\n%d | %s | %d | %s", id, nome, idade, condicaoMed);
-                            raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed);
+                            raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed, iContador);
                         }
                     } else {
                         printf("\nRegistros adicionais incompletos.\n");
@@ -158,7 +156,7 @@ int main()
                 if(op2 == 1){
                     raizId = insereNoRecId(raizId, id, nome, idade, condicaoMed, iContador);
                 }else if(op2 == 2){
-                    raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed);
+                    raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed, iContador);
                 }
             }break;
             case 2:{
@@ -211,15 +209,17 @@ int main()
                 printf("tchau! :)");
         }
     }
-
+    int j = 0;
+    int *iContando = NULL;
+    iContando = &j;
     if(op2 == 1){
-        emOrdemArquivo(raizId, log);
+        emOrdemArquivo(raizId, log, iContando);
         printf("\nGravando lista em arquivo....");
     }else if(op2 == 2){
-        emOrdemArquivo(raizNome, log);
+        emOrdemArquivo(raizNome, log, iContando);
         printf("\nGravando lista em arquivo....");
     }
-    fprintf(log, "Total de Pacientes %d", i);
+    fprintf(log, "Total de Pacientes %d", j);
 
     desalocarArvore(raizId);
     desalocarArvore(raizNome);
@@ -262,12 +262,13 @@ void emOrdem(No *raiz){
     }
 }
 
-void emOrdemArquivo(No *raiz, FILE *arquivo) {
+void emOrdemArquivo(No *raiz, FILE *arquivo, int *i) {
     if (raiz != NULL) {
-        emOrdemArquivo(raiz->esq, arquivo);
+        emOrdemArquivo(raiz->esq, arquivo, i);
         fprintf(arquivo, "ID: %d | Paciente: %s | Idade: %d | Condicao Medica: %s\n",
                 raiz->id, raiz->nome, raiz->idade, raiz->condicaoMed);
-        emOrdemArquivo(raiz->dir, arquivo);
+        (*i)++;
+        emOrdemArquivo(raiz->dir, arquivo, i);
     }
 }
 
@@ -295,7 +296,7 @@ No *insereNoRecId(No *raiz, int id, char nome[], int idade, char condicaoMed[], 
                 int novoId = id;
                 do {
                     novoId++;
-                    printf("O ID ja existe. Tentando o ID %d...\n", novoId);
+                    printf("\nO ID ja existe. Tentando o ID %d...\n", novoId);
                 } while (idExistente(raiz, novoId));
                 novoId = geraNovoId(raiz, novoId);
 
@@ -422,10 +423,12 @@ int geraNovoId(No* raiz, int id) {
 }
 
 /// Funcoes NOME
-No* insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]) {
+No* insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[], int *i) {
     if (raiz == NULL) {
         return alocaNo(id, nome, idade, condicaoMed);
+        (*i)++;
     }
+
     if (strcmp(nome, raiz->nome) == 0) {
         if (id == raiz->id) {
             printf("Paciente ja inserido!\n");
@@ -436,9 +439,9 @@ No* insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]
                 strcat(nome, "(1)");
                 int cmp = strcmp(nome, raiz->nome);
                 if (cmp < 0) {
-                    raiz->esq = insereNoRecNome(raiz->esq, id, nome, idade, condicaoMed);
+                    raiz->esq = insereNoRecNome(raiz->esq, id, nome, idade, condicaoMed, i);
                 } else {
-                    raiz->dir = insereNoRecNome(raiz->dir, id, nome, idade, condicaoMed);
+                    raiz->dir = insereNoRecNome(raiz->dir, id, nome, idade, condicaoMed, i);
                 }
             } else {
                 printf("Paciente com o mesmo nome, mas idade maior nao sera inserido.\n");
@@ -452,9 +455,9 @@ No* insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]
     }
     int cmp = strcmp(nome, raiz->nome);
     if (cmp < 0) {
-        raiz->esq = insereNoRecNome(raiz->esq, id, nome, idade, condicaoMed);
+        raiz->esq = insereNoRecNome(raiz->esq, id, nome, idade, condicaoMed, i);
     } else {
-        raiz->dir = insereNoRecNome(raiz->dir, id, nome, idade, condicaoMed);
+        raiz->dir = insereNoRecNome(raiz->dir, id, nome, idade, condicaoMed, i);
     }
     return raiz;
 }
