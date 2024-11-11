@@ -1,7 +1,5 @@
 ID: 1 | Paciente: Joao_Silva | Idade: 45 | Condicao Medica: Estavel
 ID: 2 | Paciente: Maria_Santos | Idade: 37 | Condicao Medica: Cuidados_Intensivos
-ID: 3 | Paciente: Ana_Pereira | Idade: 29 | Condicao Medica: Recuperacao
 ID: 4 | Paciente: Carlos_Ferreira | Idade: 50 | Condicao Medica: Alta
 ID: 5 | Paciente: Beatriz_Costa | Idade: 41 | Condicao Medica: Observacao
-ID: 6 | Paciente: brenda | Idade: 12 | Condicao Medica: alta
-Total de Pacientes 6
+Total de Pacientes 4
