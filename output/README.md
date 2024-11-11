@@ -1,5 +1,5 @@
 # Sistema de Registro e Busca de Pacientes em um Hospital
-
+Programado por: Brenda Amanda da Silva Garcez e Nicole Lousie Matias Jamuchewski
 Este projeto é um sistema de registro de pacientes para um hospital, desenvolvido em C como parte da disciplina de Estrutura de Dados II do curso de Ciência da Computação na Universidade Tecnológica Federal do Paraná. O sistema visa resolver problemas de gerenciamento de dados de pacientes, proporcionando uma busca rápida e eficiente através de uma Árvore Binária de Pesquisa (ABP).
 
 ## Objetivo
