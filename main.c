@@ -425,32 +425,16 @@ int geraNovoId(No* raiz, int id) {
 /// Funcoes NOME
 No* insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[], int *i) {
     if (raiz == NULL) {
-        return alocaNo(id, nome, idade, condicaoMed);
         (*i)++;
+        return alocaNo(id, nome, idade, condicaoMed);
     }
 
-    if (strcmp(nome, raiz->nome) == 0) {
-        if (id == raiz->id) {
-            printf("Paciente ja inserido!\n");
+    if (strcmp(nome, raiz->nome) == 0) {  
+            printf("\nPaciente ja inserido!\n");
             return raiz;
-        } else {
-            if (idade < raiz->idade) {
-                printf("Paciente com o mesmo nome e ID diferente. Sera inserido.\n");
-                strcat(nome, "(1)");
-                int cmp = strcmp(nome, raiz->nome);
-                if (cmp < 0) {
-                    raiz->esq = insereNoRecNome(raiz->esq, id, nome, idade, condicaoMed, i);
-                } else {
-                    raiz->dir = insereNoRecNome(raiz->dir, id, nome, idade, condicaoMed, i);
-                }
-            } else {
-                printf("Paciente com o mesmo nome, mas idade maior nao sera inserido.\n");
-            }
-            return raiz;
-        }
     }
     if (idExistente(raiz, id)) {
-        printf("ID ja existente! Atribuindo novo ID...\n");
+        printf("\nID ja existente! Atribuindo novo ID...\n");
         id = geraNovoId(raiz, id);
     }
     int cmp = strcmp(nome, raiz->nome);
@@ -459,6 +443,7 @@ No* insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]
     } else {
         raiz->dir = insereNoRecNome(raiz->dir, id, nome, idade, condicaoMed, i);
     }
+    (*i)++;
     return raiz;
 }
 
