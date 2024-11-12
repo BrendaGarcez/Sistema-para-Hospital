@@ -14,18 +14,18 @@ typedef struct no{
 
 No *alocaNo(int id, char nome[], int idade, char condicaoMed[]);
 No **ppMenor(No **raiz);
-void emOrdem(No *raiz);
+void emOrdem(No *raiz, int *i);
 void emOrdemArquivo(No *raiz, FILE *arquivo, int *i);
 void desalocarArvore(No *no);
 int geraNovoId(No* raiz, int id);
 //// Funções de ID
-No *insereNoRecId(No *raiz, int id, char nome[], int idade, char condicaoMed[], int *i);
+No *insereNoRecId(No *raiz, int id, char nome[], int idade, char condicaoMed[]);
 No *buscarNoRecId(No *raiz, int id);
 int idExistente(No *raiz, int id);
 No **buscaPaiId(No **raiz, int k);
 void removeNoId(No **raiz, int k, int *i);
 //// Funções de Nome
-No *insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[], int *i);
+No *insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]);
 No *buscarNoRecNome(No *raiz, char nome[]);
 No **buscaPaiNome(No **raiz, char nome[]);
 void removeNoNome(No **raiz, char nome[], int *i);
@@ -66,7 +66,7 @@ int main()
             while(i < totalPacientes && (res = fscanf(arq, "%d %s %d %s", &id, nome, &idade, condicaoMed ))== 4)
             {
                 printf("\n%d %s %d %s", id, nome, idade, condicaoMed);
-                raizId = insereNoRecId(raizId, id, nome, idade, condicaoMed, iContador);
+                raizId = insereNoRecId(raizId, id, nome, idade, condicaoMed);
                 i++;
             }
             if (res != 4) {
@@ -84,7 +84,7 @@ int main()
 
                         while (fscanf(arq, "%d %s %d %s", &id, nome, &idade, condicaoMed) == 4) {
                             printf("\n%d | %s | %d | %s", id, nome, idade, condicaoMed);
-                            raizId = insereNoRecId(raizId, id, nome, idade, condicaoMed, iContador);
+                            raizId = insereNoRecId(raizId, id, nome, idade, condicaoMed);
                         }
                     } else {
                         printf("\nRegistros adicionais incompletos.\n");
@@ -104,7 +104,7 @@ int main()
             while(i < totalPacientes && (res = fscanf(arq, "%d %s %d %s", &id, nome, &idade, condicaoMed ))== 4)
             {
                 printf("\n%d %s %d %s", id, nome, idade, condicaoMed);
-                raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed, iContador);
+                raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed);
                 i++;
             }
             if (res != 4) {
@@ -122,7 +122,7 @@ int main()
 
                         while (fscanf(arq, "%d %s %d %s", &id, nome, &idade, condicaoMed) == 4) {
                             printf("\n%d | %s | %d | %s", id, nome, idade, condicaoMed);
-                            raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed, iContador);
+                            raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed);
                         }
                     } else {
                         printf("\nRegistros adicionais incompletos.\n");
@@ -154,9 +154,9 @@ int main()
                 printf("\nInforme a condicao medica do paciente: ");
                 scanf("%s", condicaoMed);
                 if(op2 == 1){
-                    raizId = insereNoRecId(raizId, id, nome, idade, condicaoMed, iContador);
+                    raizId = insereNoRecId(raizId, id, nome, idade, condicaoMed);
                 }else if(op2 == 2){
-                    raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed, iContador);
+                    raizNome = insereNoRecNome(raizNome, id, nome, idade, condicaoMed);
                 }
             }break;
             case 2:{
@@ -198,11 +198,19 @@ int main()
             }break;
             case 4:{
                 if(op2 == 1){
+                    int j = 0;
+                    int *iContando = NULL;
+                    iContando = &j;
                     printf("\n Lista por ID: \n");
-                    emOrdem(raizId);
+                    emOrdem(raizId, iContando);
+                    printf("Total de pacientes: %d \n", j);
                 }else if(op2 == 2){
+                    int j = 0;
+                    int *iContando = NULL;
+                    iContando = &j;
                     printf("\n Lista por nome: \n");
-                    emOrdem(raizNome);
+                    emOrdem(raizNome, iContando);
+                    printf("Total de pacientes: %d \n", j);
                 }
             }break;
             default:
@@ -254,14 +262,15 @@ No **ppMenor(No **raiz)//a entrada e o lado direito da arvore
     return pmenor;
 }
 //esq, raiz, dir
-void emOrdem(No *raiz){
+void emOrdem(No *raiz, int *i){
     if (raiz != NULL) {
-        emOrdem(raiz->esq);
+        emOrdem(raiz->esq, i);
         printf(" ID:%d | Paciente:%s | Idade:%d | Condicao Medica: %s\n", raiz->id, raiz->nome, raiz->idade, raiz->condicaoMed);
-        emOrdem(raiz->dir);
+        (*i)++;
+        emOrdem(raiz->dir, i);
     }
 }
-
+/// Listagem de Pacientes em Arquivo in-order
 void emOrdemArquivo(No *raiz, FILE *arquivo, int *i) {
     if (raiz != NULL) {
         emOrdemArquivo(raiz->esq, arquivo, i);
@@ -283,10 +292,9 @@ void desalocarArvore(No *no) {
 }
 
 ///Funcoes ID
-No *insereNoRecId(No *raiz, int id, char nome[], int idade, char condicaoMed[], int *i) {
+No *insereNoRecId(No *raiz, int id, char nome[], int idade, char condicaoMed[]) {
     if (raiz == NULL) {
         return alocaNo(id, nome, idade, condicaoMed);
-        (*i)++;
     } else {
         if (id == raiz->id) {
             if (strcmp(raiz->nome, nome) == 0) {
@@ -302,16 +310,16 @@ No *insereNoRecId(No *raiz, int id, char nome[], int idade, char condicaoMed[], 
 
                 printf("Novo ID disponivel: %d. Inserindo o paciente com esse ID.\n", novoId);
                 if (novoId < raiz->id) {
-                    raiz->esq = insereNoRecId(raiz->esq, novoId, nome, idade, condicaoMed, i);
+                    raiz->esq = insereNoRecId(raiz->esq, novoId, nome, idade, condicaoMed);
                 } else {
-                    raiz->dir = insereNoRecId(raiz->dir, novoId, nome, idade, condicaoMed, i);
+                    raiz->dir = insereNoRecId(raiz->dir, novoId, nome, idade, condicaoMed);
                 }
                 return raiz;
             }
         } else if (id < raiz->id) {
-            raiz->esq = insereNoRecId(raiz->esq, id, nome, idade, condicaoMed, i);
+            raiz->esq = insereNoRecId(raiz->esq, id, nome, idade, condicaoMed);
         } else {
-            raiz->dir = insereNoRecId(raiz->dir, id, nome, idade, condicaoMed, i);
+            raiz->dir = insereNoRecId(raiz->dir, id, nome, idade, condicaoMed);
         }
     }
     return raiz;
@@ -423,9 +431,8 @@ int geraNovoId(No* raiz, int id) {
 }
 
 /// Funcoes NOME
-No* insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[], int *i) {
+No* insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]) {
     if (raiz == NULL) {
-        (*i)++;
         return alocaNo(id, nome, idade, condicaoMed);
     }
 
@@ -439,11 +446,10 @@ No* insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]
     }
     int cmp = strcmp(nome, raiz->nome);
     if (cmp < 0) {
-        raiz->esq = insereNoRecNome(raiz->esq, id, nome, idade, condicaoMed, i);
+        raiz->esq = insereNoRecNome(raiz->esq, id, nome, idade, condicaoMed);
     } else {
-        raiz->dir = insereNoRecNome(raiz->dir, id, nome, idade, condicaoMed, i);
+        raiz->dir = insereNoRecNome(raiz->dir, id, nome, idade, condicaoMed);
     }
-    (*i)++;
     return raiz;
 }
 
