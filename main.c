@@ -306,6 +306,10 @@ No *insereNoRecId(No *raiz, int id, char nome[], int idade, char condicaoMed[]) 
     if (raiz == NULL) {
         return alocaNo(id, nome, idade, condicaoMed);
     } else {
+        if(strcmp(raiz->nome, nome) == 0){
+            printf("\n Paciente ja inserido\n");
+            return raiz;
+        }
         if (id == raiz->id) {
             if (strcmp(raiz->nome, nome) == 0) {
                 printf("Erro: O nome '%s' ja existe com o ID %d. Nao foi possivel inserir.\n", nome, id);

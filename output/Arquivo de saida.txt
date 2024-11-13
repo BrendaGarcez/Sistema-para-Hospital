@@ -1,0 +1,5 @@
+ID: 1 | Paciente: Maria_Santos | Idade: 45 | Condicao Medica: Estavel
+ID: 4 | Paciente: Carlos_Ferreira | Idade: 50 | Condicao Medica: Alta
+ID: 5 | Paciente: Ana_Pereira | Idade: 29 | Condicao Medica: Recuperacao
+ID: 6 | Paciente: Beatriz_Costa | Idade: 41 | Condicao Medica: Observacao
+Total de Pacientes 4
