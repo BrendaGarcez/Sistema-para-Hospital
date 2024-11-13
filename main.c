@@ -23,33 +23,34 @@ No *insereNoRecId(No *raiz, int id, char nome[], int idade, char condicaoMed[]);
 No *buscarNoRecId(No *raiz, int id);
 int idExistente(No *raiz, int id);
 No **buscaPaiId(No **raiz, int k);
-void removeNoId(No **raiz, int k, int *i);
+void removeNoId(No **raiz, int k);
 //// Funções de Nome
 No *insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]);
 No *buscarNoRecNome(No *raiz, char nome[]);
 No **buscaPaiNome(No **raiz, char nome[]);
-void removeNoNome(No **raiz, char nome[], int *i);
+void removeNoNome(No **raiz, char nome[]);
 
 int main()
 {
     No *raizId = NULL, *raizNome=NULL, *achouId=NULL, *achouNome=NULL;
-    int *iContador = NULL;
     int op=1, op2, op3 = 0, id, idade, totalPacientes, i = 0;
     char nome[20], condicaoMed[20];
-    i = 0;
-    iContador = &i;
-        FILE *log = NULL, *arq = NULL;
-        log = fopen("Arquivo de saida.txt", "w");
-        if (!log) {
-            printf("Erro ao abrir o arquivo de saida.\n");
-            return 1;
-        }
-        arq = fopen("Arquivo de Entrada.txt", "r");
-        if (arq == NULL) {
-            printf("Erro ao abrir o arquivo de entrada.\n");
-            return 1;
-        }
 
+    FILE *log = NULL, *arq = NULL;
+    
+    arq = fopen("Arquivo de Entrada.txt", "r");
+    if (arq == NULL) {
+        printf("Erro ao abrir o arquivo de entrada.\n");
+        return 1;
+    }
+
+    log = fopen("Arquivo de saida.txt", "w");
+    if (!log) {
+        printf("Erro ao abrir o arquivo de saida.\n");
+        return 1;
+    }
+
+    ///Menu de inserção para escolha de Árvore
     while (op3 == 0){
         printf("Deseja inserir por:\n");
         printf(" 1- ID \n 2- Nome\n");
@@ -137,10 +138,11 @@ int main()
             break;
         }
     }
-
-    while(op!=5)
+    ///Menu para manipulação de informações
+    int gravado = 0;
+    while(op!=6)
     {
-        printf("\n 1-Cadastro de Paciente | 2-Buscar | 3-Remover Paciente | 4-Lista Pacientes | 5-Sair \n");
+        printf("\n 1-Cadastro de Paciente | 2-Buscar | 3-Remover Paciente | 4-Lista Pacientes | 5- Gravar em Arquivo de Texto | 6- Sair \n");
         scanf("%d",&op);
         switch(op)
         {
@@ -188,46 +190,54 @@ int main()
                 if(op2 == 1){
                     printf("Informe o ID do paciente a ser removido: ");
                     scanf("%d",&id);
-                    removeNoId(&raizId, id, iContador);
+                    removeNoId(&raizId, id);
                 }else if(op2 == 2){
                     printf("Informe o nome do paciente a ser removido: ");
                     scanf("%s", nome);
-                    removeNoNome(&raizNome, nome, iContador);
+                    removeNoNome(&raizNome, nome);
 
                 }
             }break;
             case 4:{
+                int j = 0;
                 if(op2 == 1){
-                    int j = 0;
-                    int *iContando = NULL;
-                    iContando = &j;
                     printf("\n Lista por ID: \n");
-                    emOrdem(raizId, iContando);
+                    emOrdem(raizId, &j);
                     printf("Total de pacientes: %d \n", j);
                 }else if(op2 == 2){
-                    int j = 0;
-                    int *iContando = NULL;
-                    iContando = &j;
                     printf("\n Lista por nome: \n");
-                    emOrdem(raizNome, iContando);
+                    emOrdem(raizNome, &j);
                     printf("Total de pacientes: %d \n", j);
                 }
             }break;
+            case 5:{
+                int j = 0;
+                if(op2 == 1){
+                    emOrdemArquivo(raizId, log, &j);
+                }else if(op2 == 2){
+                    emOrdemArquivo(raizNome, log, &j);
+                }
+                printf("\nGravando lista em arquivo....");
+                fprintf(log, "Total de Pacientes %d", j);
+                gravado = 1;
+            }break;
             default:
                 printf("tchau! :)");
+            break;
         }
     }
+
+    ///Caso a gravação em arquivo de saida do menu não seja ativada 
     int j = 0;
-    int *iContando = NULL;
-    iContando = &j;
-    if(op2 == 1){
-        emOrdemArquivo(raizId, log, iContando);
+    if (gravado == 0) {
+        if(op2 == 1){
+            emOrdemArquivo(raizId, log, &j);
+        }else if(op2 == 2){
+            emOrdemArquivo(raizNome, log, &j);
+        }
         printf("\nGravando lista em arquivo....");
-    }else if(op2 == 2){
-        emOrdemArquivo(raizNome, log, iContando);
-        printf("\nGravando lista em arquivo....");
+        fprintf(log, "Total de Pacientes %d", j);
     }
-    fprintf(log, "Total de Pacientes %d", j);
 
     desalocarArvore(raizId);
     desalocarArvore(raizNome);
@@ -251,8 +261,8 @@ No *alocaNo(int id, char nome[], int idade, char condicaoMed[])
     }
     return novo;
 }
-
-No **ppMenor(No **raiz)//a entrada e o lado direito da arvore
+//a entrada e o lado direito da arvore
+No **ppMenor(No **raiz)
 {
     No **pmenor=raiz;
     while((*pmenor)->esq)
@@ -314,6 +324,7 @@ No *insereNoRecId(No *raiz, int id, char nome[], int idade, char condicaoMed[]) 
                 } else {
                     raiz->dir = insereNoRecId(raiz->dir, novoId, nome, idade, condicaoMed);
                 }
+                printf("%d %s %d %s", novoId, nome, idade, condicaoMed);
                 return raiz;
             }
         } else if (id < raiz->id) {
@@ -341,7 +352,7 @@ No *buscarNoRecId(No *raiz, int id)
             return buscarNoRecId(raiz->dir, id);
     }
 }
-
+/// Verifica tanto na inserção de nome quanto de ID se os IDs já estão na lista
 int idExistente(No *raiz, int id) {
     if (raiz == NULL) {
         return 0;
@@ -352,6 +363,7 @@ int idExistente(No *raiz, int id) {
     return (id < raiz->id) ? idExistente(raiz->esq, id) : idExistente(raiz->dir, id);
 }
 
+/// Usada na remoção
 No **buscaPaiId(No **raiz, int k)
 {
   if (*raiz == NULL)
@@ -368,7 +380,7 @@ No **buscaPaiId(No **raiz, int k)
   return raiz;
 }
 
-void removeNoId(No **raiz, int k, int *i)
+void removeNoId(No **raiz, int k)
 {
     No **pai=NULL;
     if((*raiz) == NULL)
@@ -379,7 +391,6 @@ void removeNoId(No **raiz, int k, int *i)
     {
         free(*pai);
         *pai = NULL;
-        (*i)--;
         return;
     }
     //2o caso --> remover pai com 1 filho apenas
@@ -403,7 +414,6 @@ void removeNoId(No **raiz, int k, int *i)
                 }else
                 printf("Remocao realizada!\n");
             }
-            (*i)--;
             return;
     }
     //    3o caso --> remover pai com 2 filhos
@@ -416,11 +426,12 @@ void removeNoId(No **raiz, int k, int *i)
                 strcpy((*pai)->nome, (*paux)->nome);
                 (*pai)->idade = (*paux)->idade;
                 strcpy((*pai)->condicaoMed, (*paux)->condicaoMed);
-                removeNoId(paux, (*paux)->id, i);
+                removeNoId(paux, (*paux)->id);
             }
             printf("\nRemovido com Sucesso!\n");
         }
 }
+/// Gera novos Ids para evitar duplicatas
 int geraNovoId(No* raiz, int id) {
     int novoId = id;
     while (idExistente(raiz, novoId)) {
@@ -431,6 +442,7 @@ int geraNovoId(No* raiz, int id) {
 }
 
 /// Funcoes NOME
+///Não aceita pacientes com nomes iguais mesmo, o projeto pede que não tenha nomes iguais
 No* insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]) {
     if (raiz == NULL) {
         return alocaNo(id, nome, idade, condicaoMed);
@@ -441,7 +453,6 @@ No* insereNoRecNome(No *raiz, int id, char nome[], int idade, char condicaoMed[]
             return raiz;
     }
     if (idExistente(raiz, id)) {
-        printf("\nID ja existente! Atribuindo novo ID...\n");
         id = geraNovoId(raiz, id);
     }
     int cmp = strcmp(nome, raiz->nome);
@@ -487,7 +498,7 @@ No **buscaPaiNome(No **raiz, char nome[])
   return raiz;
 }
 
-void removeNoNome(No **raiz, char nome[], int *i)
+void removeNoNome(No **raiz, char nome[])
 {
     No **pai=NULL;
     if((*raiz) == NULL)
@@ -498,7 +509,6 @@ void removeNoNome(No **raiz, char nome[], int *i)
     {
         free(*pai);
         *pai = NULL;
-        (*i)--;
         return;
     }
     //2o caso --> remover pai com 1 filho apenas
@@ -520,7 +530,6 @@ void removeNoNome(No **raiz, char nome[], int *i)
                 printf("Paciente sendo removido: %s\n", paux->nome);
                 free(paux);
                 paux = NULL;
-                (*i)--;
                 if(paux){
                     printf("a Remocao deu errado!\n");
                 }else
@@ -538,7 +547,7 @@ void removeNoNome(No **raiz, char nome[], int *i)
                 strcpy((*pai)->nome, (*paux)->nome);
                 (*pai)->idade = (*paux)->idade;
                 strcpy((*pai)->condicaoMed, (*paux)->condicaoMed);
-                removeNoNome(paux, (*paux)->nome, i);
+                removeNoNome(paux, (*paux)->nome);
             }
             printf("\nRemovido com Sucesso!\n");
         }
