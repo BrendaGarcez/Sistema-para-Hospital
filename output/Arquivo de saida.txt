@@ -1,5 +1,8 @@
+ID: 3 | Paciente: Ana_Pereira | Idade: 29 | Condicao Medica: Recuperacao
+ID: 5 | Paciente: Beatriz_Costa | Idade: 41 | Condicao Medica: Observacao
+ID: 4 | Paciente: Brenda | Idade: 13 | Condicao Medica: aa
+ID: 2 | Paciente: Jose_Alberto | Idade: 37 | Condicao Medica: Cuidados_Intensivos
 ID: 1 | Paciente: Maria_Santos | Idade: 45 | Condicao Medica: Estavel
-ID: 4 | Paciente: Carlos_Ferreira | Idade: 50 | Condicao Medica: Alta
-ID: 5 | Paciente: Ana_Pereira | Idade: 29 | Condicao Medica: Recuperacao
-ID: 6 | Paciente: Beatriz_Costa | Idade: 41 | Condicao Medica: Observacao
-Total de Pacientes 4
+ID: 7 | Paciente: Nicole | Idade: 12 | Condicao Medica: alalala
+ID: 4 | Paciente: brenda | Idade: 23 | Condicao Medica: aaa
+Total de Pacientes 7
