@@ -134,11 +134,11 @@ int main()
         }
         break;
         default:
-            printf("\nFalha na insercao!!\n");
+            printf("\nInsira 1 ou 2\n");
             break;
         }
     }
-    ///Menu para manipulação de informações
+        ///Menu para manipulação de informações
     int gravado = 0;
     while(op!=6)
     {
@@ -238,7 +238,7 @@ int main()
         printf("\nGravando lista em arquivo....");
         fprintf(log, "Total de Pacientes %d", j);
     }
-
+    
     desalocarArvore(raizId);
     desalocarArvore(raizNome);
     fclose(log);
